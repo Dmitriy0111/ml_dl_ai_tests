@@ -8,8 +8,7 @@
 #include <cassert>
 
 template <typename T>
-class matrix
-{
+class matrix {
 public:
     matrix();
     matrix(unsigned size_i, unsigned size_j, T fill = 0);
@@ -35,6 +34,8 @@ public:
     void copy_data(T ** oth_data);
 
     void normal();
+
+    static matrix<T> dot(const matrix<T> & a, const matrix<T> & b);
 
     matrix<T> operator+(const matrix<T> & oth);
     matrix<T> operator+(const T & oth);
@@ -123,17 +124,15 @@ unsigned matrix<T>::get_size_j() {
 }
 
 template<typename T>
-void matrix<T>::apply_f(T(*f)(T))
-{
+void matrix<T>::apply_f(T(*f)(T)) {
     for (int i = 0; i < size_i; i++)
         for (int j = 0; j < size_j; j++)
             data[i][j] = f(data[i][j]);
 }
 
 template<typename T>
-matrix<T> matrix<T>::Tr()
-{
-    matrix<T> tmp(this->size_j,this->size_i);
+matrix<T> matrix<T>::Tr() {
+    matrix<T> tmp(this->size_j, this->size_i);
 
     for (int i = 0; i < this->size_j; i++)
         for (int j = 0; j < this->size_i; j++)
@@ -178,7 +177,26 @@ void matrix<T>::normal() {
 }
 
 template<typename T>
+matrix<T> matrix<T>::dot(const matrix<T>& a, const matrix<T>& b) {
+    assert(a.size_j == b.size_i);
+
+    matrix<T> tmp(a.size_i, b.size_j);
+
+    for (int i = 0; i < tmp.size_i; i++) {
+        for (int j = 0; j < tmp.size_j; j++) {
+            for (int k = 0; k < a.size_j; k++) {
+                tmp.data[i][j] += a.data[i][k] * b.data[k][j];
+            }
+        }
+    }
+
+    return tmp;
+}
+
+template<typename T>
 matrix<T> matrix<T>::operator+(const matrix<T> & oth) {
+    assert((this->size_i == oth.size_i) && (this->size_j == oth.size_j));
+
     matrix<T> tmp(*this);
 
     for (int i = 0; i < size_i; i++)
@@ -201,6 +219,8 @@ matrix<T> matrix<T>::operator+(const T & oth) {
 
 template<typename T>
 matrix<T> matrix<T>::operator+=(const matrix<T> & oth) {
+    assert((this->size_i == oth.size_i) && (this->size_j == oth.size_j));
+
     for (int i = 0; i < size_i; i++)
         for (int j = 0; j < size_j; j++)
             this->data[i][j] += oth.data[i][j];
@@ -219,6 +239,8 @@ matrix<T> matrix<T>::operator+=(const T & oth) {
 
 template<typename T>
 matrix<T> matrix<T>::operator-(const matrix<T> & oth) {
+    assert((this->size_i == oth.size_i) && (this->size_j == oth.size_j));
+
     matrix<T> tmp(*this);
 
     for (int i = 0; i < size_i; i++)
@@ -230,15 +252,13 @@ matrix<T> matrix<T>::operator-(const matrix<T> & oth) {
 
 template<typename T>
 matrix<T> matrix<T>::operator*(const matrix<T> & oth) {
-    assert(this->size_j == oth.size_i);
+    assert((this->size_i == oth.size_i) && (this->size_j == oth.size_j));
 
-    matrix<T> tmp(this->size_i, oth.size_j);
+    matrix<T> tmp(this->size_i, this->size_j);
 
     for (int i = 0; i < tmp.size_i; i++) {
         for (int j = 0; j < tmp.size_j; j++) {
-            for (int k = 0; k < this->size_j; k++) {
-                tmp.data[i][j] += this->data[i][k] * oth.data[k][j];
-            }
+            tmp.data[i][j] = this->data[i][j] * oth.data[i][j];
         }
     }
 

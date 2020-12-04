@@ -1,8 +1,9 @@
+## imports
 import numpy as np
 import scipy.special
 %matplotlib inline
 import matplotlib.pyplot
-
+## neural network class
 class neuralNetwork:
     def __init__(self, inputnodes, hiddennodes, outputnodes, learningrate):
         self.inodes = inputnodes
@@ -55,34 +56,38 @@ class neuralNetwork:
     def save_coefs(self, path2folder):
         np.savetxt(path2folder+"wih.dat",self.wih)
         np.savetxt(path2folder+"who.dat",self.who)
-
-
+## network parameters
 input_nodes = 784
 hidden_nodes = 100
 output_nodes = 10
 learning_rate = 0.3
-
+epoch = 3
+## network
 nn_mnist = neuralNetwork(input_nodes,hidden_nodes,output_nodes,learning_rate)
+## path to files with training and testing datas
+path2train = ""
+path2test = ""
+## training network
+for ep in range(epoch):
+    training_data_file = open(path2train+"mnist_train.csv", 'r') 
+    training_data_list = training_data_file.readlines () 
+    training_data_file.close()
 
-training_data_file = open("mnist_train.csv", 'r') 
-training_data_list = training_data_file.readlines () 
-training_data_file.close()
+    for record in training_data_list:
+        all_values = record.split(',')
 
-for record in training_data_list:
-    all_values = record.split(',')
+        inputs = (np.asfarray(all_values[1:]) / 255.0 * 0.99) + 0.01
 
-    inputs = (np.asfarray(all_values[1:]) / 255.0 * 0.99) + 0.01
+        targets = np.zeros(output_nodes) + 0.01
 
-    targets = np.zeros(output_nodes) + 0.01
+        targets[int(all_values[0])] =0.99
+        nn_mnist.train(inputs, targets) 
+        pass
 
-    targets[int(all_values[0])] =0.99
-    nn_mnist.train(inputs, targets) 
-    pass
-
-test_data_file = open("mnist_test.csv", 'r') 
-test_data_list = test_data_file.readlines () 
-test_data_file.close()
-
+    test_data_file = open(path2test+"mnist_test.csv", 'r') 
+    test_data_list = test_data_file.readlines () 
+    test_data_file.close()
+## testing network
 scorecard = []
 for record in test_data_list:
     all_values = record.split(',')
@@ -101,8 +106,6 @@ for record in test_data_list:
         scorecard.append(0) 
         pass
     pass
-
+## printing results
 scorecard_array = np.asarray(scorecard)
 print ("Total score = ", scorecard_array.sum() / scorecard_array.size)
-
-nn_mnist.save_coefs("")

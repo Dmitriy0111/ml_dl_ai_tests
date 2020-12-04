@@ -16,13 +16,13 @@ private:
     matrix<T>       * I;
     matrix<T>       * wih;
     matrix<T>       * H;
-    matrix<T>       * HE;
     matrix<T>       * who;
     matrix<T>       * O;
+    matrix<T>       * HE;
     matrix<T>       * OE;
 
 public:
-    T               (*act_f)(T);
+    T(*act_f)(T);
 
     nn();
     nn(unsigned I_len, unsigned H_len, unsigned O_len, double learning_rate);
@@ -35,7 +35,7 @@ public:
     void load_coefs();
 
     matrix<T> * query(matrix<T> * I);
-    void train(matrix<T> * I, matrix<T> * T);
+    void train(matrix<T> * I, matrix<T> * Tgt);
 };
 
 template <typename T>
@@ -75,7 +75,7 @@ void nn<T>::save_coefs() {
     fp = std::ofstream("wih.dat");
     for (unsigned i = 0; i < wih->get_size_i(); i++) {
         for (unsigned j = 0; j < wih->get_size_j(); j++)
-            fp << wih->get_val(i, j) << ( j == wih->get_size_j() - 1 ) ? "" : " ";
+            fp << wih->get_val(i, j) << (j == wih->get_size_j() - 1) ? "" : " ";
         fp << '\n';
     }
     fp.close();
@@ -139,7 +139,7 @@ void nn<T>::load_coefs() {
         i = 0;
         j++;
     }
-    
+
     fp.close();
 }
 
@@ -148,56 +148,32 @@ matrix<T> * nn<T>::query(matrix<T>* I)
 {
     this->I = I;
 
-    *H = (*wih) * (*this->I);
+    *H = matrix<T>::dot(*wih, *this->I);
     H->apply_f(act_f);
 
-    *O = (*who) * (*H);
+    *O = matrix<T>::dot(*who, *H);
     O->apply_f(act_f);
 
     return O;
 }
 
 template<typename T>
-void nn<T>::train(matrix<T>* I, matrix<T>* T) {
+void nn<T>::train(matrix<T>* I, matrix<T>* Tgt) {
     this->I = I;
 
-    *H = (*wih) * (*this->I);
+    *H = matrix<T>::dot(*wih, *this->I);
     H->apply_f(act_f);
 
-    *O = (*who) * (*H);
+    *O = matrix<T>::dot(*who, *H);
     O->apply_f(act_f);
 
-    *OE = (*T) - (*this->O);
+    *OE = (*Tgt) - (*this->O);
 
-    *HE = who->Tr() * (*this->OE);
+    *HE = matrix<T>::dot(who->Tr(), *this->OE);
 
-    matrix<double> datas(*OE);
+    *who += matrix<T>::dot((*OE)*(*O)*((*O)*(-1.0) + 1), H->Tr()) * this->lr;
 
-    for (unsigned i = 0; i < datas.get_size_i(); i++) {
-        datas.set_val(i, 0, datas.get_val(i, 0)*(*O).get_val(i, 0));
-    }
-
-    for (unsigned i = 0; i < datas.get_size_i(); i++) {
-        datas.set_val(i, 0, datas.get_val(i, 0)*( 1.0 - (*O).get_val(i, 0) ));
-    }
-
-    datas = datas * H->Tr();
-    datas = datas * this->lr;
-    *who += datas; // (((*OE) * (*O) * ((*O)*(-1.0) + 1)) * H->Tr()) * this->lr;
-
-    datas = (*HE);
-
-    for (unsigned i = 0; i < datas.get_size_i(); i++) {
-        datas.set_val(i, 0, datas.get_val(i, 0)*(*H).get_val(i, 0));
-    }
-
-    for (unsigned i = 0; i < datas.get_size_i(); i++) {
-        datas.set_val(i, 0, datas.get_val(i, 0)*(1.0 - (*H).get_val(i, 0)));
-    }
-
-    datas = datas * I->Tr();
-    datas = datas * this->lr;
-    *wih += datas; //(((*HE) * (*H) * ((*H)*(-1.0) + 1)) * this->I->Tr()) * this->lr;
+    *wih += matrix<T>::dot((*HE)*(*H)*((*H)*(-1.0) + 1), I->Tr()) * this->lr;
 };
 
 template <typename T>
