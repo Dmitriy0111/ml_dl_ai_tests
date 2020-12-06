@@ -2,6 +2,7 @@
 #define __NN_HPP
 
 #include "matrix.hpp"
+#include "fact.hpp"
 #include <fstream>
 
 template <typename T>
@@ -22,8 +23,6 @@ private:
     matrix<T>       * OE;
 
 public:
-    T(*act_f)(T);
-
     nn();
     nn(unsigned I_len, unsigned H_len, unsigned O_len, double learning_rate);
 
@@ -149,10 +148,10 @@ matrix<T> * nn<T>::query(matrix<T>* I)
     this->I = I;
 
     *H = matrix<T>::dot(*wih, *this->I);
-    H->apply_f(act_f);
+    H->apply_f(ReLU);
 
     *O = matrix<T>::dot(*who, *H);
-    O->apply_f(act_f);
+    O->apply_f(sigmoida);
 
     return O;
 }
@@ -162,18 +161,20 @@ void nn<T>::train(matrix<T>* I, matrix<T>* Tgt) {
     this->I = I;
 
     *H = matrix<T>::dot(*wih, *this->I);
-    H->apply_f(act_f);
+    H->apply_f(ReLU);
 
     *O = matrix<T>::dot(*who, *H);
-    O->apply_f(act_f);
+    O->apply_f(sigmoida);
 
     *OE = (*Tgt) - (*this->O);
 
     *HE = matrix<T>::dot(who->Tr(), *this->OE);
 
-    *who += matrix<T>::dot((*OE)*(*O)*((*O)*(-1.0) + 1), H->Tr()) * this->lr;
+    O->apply_f(sigmoida_);
+    *who += matrix<T>::dot((*OE)*(*O), H->Tr()) * this->lr;
 
-    *wih += matrix<T>::dot((*HE)*(*H)*((*H)*(-1.0) + 1), I->Tr()) * this->lr;
+    H->apply_f(ReLU_);
+    *wih += matrix<T>::dot((*HE)*(*H), I->Tr()) * this->lr;
 };
 
 template <typename T>
@@ -182,6 +183,8 @@ nn<T>::~nn() {
     delete H;
     delete who;
     delete O;
+    delete HE;
+    delete OE;
 };
 
 #endif /* __NN_HPP */
