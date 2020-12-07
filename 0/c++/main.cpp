@@ -9,6 +9,7 @@
 #include <chrono>
 #include "matrix.hpp"
 #include "nn.hpp"
+#include "fact.hpp"
 
 bool read_csv_line(std::ifstream *fp, int * label, matrix<double> * M) {
     std::string line;
@@ -42,11 +43,13 @@ int main() {
     long time_c;
     long time_n;
 
-    for (int ep = 0; ep < 7; ep++) {
+	//nn_mnist.load_coefs();
+
+    for (int ep = 0; ep < 20; ep++) {
         std::cout << "Epoch : " << ep << std::endl;
         std::cout << "Train model : " << std::endl;
         progress = 0;
-        fp = std::ifstream("C:\\Users\\Dmitriy\\Downloads\\mnist_train.csv");
+        fp = std::ifstream("D:\\DM\\testtest\\mnist_train.csv");
         time_c = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
         while (read_csv_line(&fp, &label, &I_)) {
             T_.fill_matrix(0.001);
@@ -71,7 +74,7 @@ int main() {
 
         nn_mnist.save_coefs();
 
-        fp = std::ifstream("C:\\Users\\Dmitriy\\Downloads\\mnist_test.csv");
+        fp = std::ifstream("D:\\DM\\testtest\\mnist_test.csv");
         std::cout << "Test model : " << std::endl;
         unsigned pass_cnt = 0;
         progress = 0;
@@ -115,6 +118,8 @@ int main() {
     }
 
     std::cout << std::endl;
+
+	nn_mnist.save_coefs();
 
     return 0;
 }
