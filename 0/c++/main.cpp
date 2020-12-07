@@ -31,7 +31,7 @@ bool read_csv_line(std::ifstream *fp, int * label, matrix<double> * M) {
 }
 
 int main() {
-    nn<double>      nn_mnist(784, 64, 10, 0.001);
+    nn<double>      nn_mnist;
     matrix<double>  * O_;
     matrix<double>  I_(784, 1);
     matrix<double>  T_(10, 1);
@@ -42,6 +42,15 @@ int main() {
 
     long time_c;
     long time_n;
+
+	nn_mnist.add(784, ReLU_e);
+	nn_mnist.add(32, ReLU_e);
+	nn_mnist.add(32, ReLU_e);
+	nn_mnist.add(10, sigmoida_e);
+	
+	nn_mnist.set_lr(0.0001);
+
+	nn_mnist.compile();
 
 	//nn_mnist.load_coefs();
 

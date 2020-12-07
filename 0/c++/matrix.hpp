@@ -7,6 +7,8 @@
 #include <cmath>
 #include <cassert>
 
+#include "fact.hpp"
+
 template <typename T>
 class matrix {
 public:
@@ -50,6 +52,19 @@ public:
     matrix<T> operator/=(const T & oth);
 
     matrix<T> operator=(const matrix<T> & oth);
+
+	template <typename T>
+    friend void sigmoida(matrix<T> & M);
+	template <typename T>
+    friend void sigmoida_(matrix<T> & M);
+	template <typename T>
+    friend void ReLU(matrix<T> & M);
+	template <typename T>
+    friend void ReLU_(matrix<T> & M);
+	template <typename T>
+    friend void softmax(matrix<T> & M);
+	template <typename T>
+    friend void softmax_(matrix<T> & M);
 
 private:
     T           ** data;
