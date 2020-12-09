@@ -17,20 +17,20 @@ bool m_sl<T>::save(matrix<T> & M, std::string path2file, std::string file_name) 
     std::ofstream fp;
 
     fp = std::ofstream(path2file+file_name+".dat");
-	if (!fp) {
-		return false;
-	}
+    if (!fp) {
+        return false;
+    }
     for (unsigned i = 0; i < M.get_size_i(); i++) {
-		for (unsigned j = 0; j < M.get_size_j(); j++) {
-			fp << M.get_val(i, j);
-			if (j != (M.get_size_j() - 1))
-				fp << " ";
-		}
-		fp << '\n';
+        for (unsigned j = 0; j < M.get_size_j(); j++) {
+            fp << M.get_val(i, j);
+            if (j != (M.get_size_j() - 1))
+                fp << " ";
+        }
+        fp << '\n';
     }
 
     fp.close();
-	return true;
+    return true;
 }
 
 template <typename T>
@@ -44,9 +44,9 @@ bool m_sl<T>::load(matrix<T> & M, std::string path2file, std::string file_name) 
     T val;
 
     fp = std::ifstream(path2file+file_name+".dat");
-	if (!fp) {
-		return false;
-	}
+    if (!fp) {
+        return false;
+    }
     while (true)
     {
         if (!std::getline(fp, line))
@@ -65,7 +65,7 @@ bool m_sl<T>::load(matrix<T> & M, std::string path2file, std::string file_name) 
     }
 
     fp.close();
-	return true;
+    return true;
 }
 
 #endif /* __M_SL_HPP */

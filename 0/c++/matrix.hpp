@@ -45,25 +45,32 @@ public:
     matrix<T> operator+=(const T & oth);
 
     matrix<T> operator-(const matrix<T> & oth);
+    matrix<T> operator-(const T & oth);
+    matrix<T> operator-=(const matrix<T> & oth);
+    matrix<T> operator-=(const T & oth);
 
     matrix<T> operator*(const matrix<T> & oth);
     matrix<T> operator*(const T & oth);
+    matrix<T> operator*=(const matrix<T> & oth);
+    matrix<T> operator*=(const T & oth);
 
     matrix<T> operator/=(const T & oth);
 
     matrix<T> operator=(const matrix<T> & oth);
 
-	template <typename T>
+    matrix<T> operator-();
+
+    template <typename T>
     friend void sigmoida(matrix<T> & M);
-	template <typename T>
+    template <typename T>
     friend void sigmoida_(matrix<T> & M);
-	template <typename T>
+    template <typename T>
     friend void ReLU(matrix<T> & M);
-	template <typename T>
+    template <typename T>
     friend void ReLU_(matrix<T> & M);
-	template <typename T>
+    template <typename T>
     friend void softmax(matrix<T> & M);
-	template <typename T>
+    template <typename T>
     friend void softmax_(matrix<T> & M);
 
 private:
@@ -197,13 +204,10 @@ matrix<T> matrix<T>::dot(const matrix<T>& a, const matrix<T>& b) {
 
     matrix<T> tmp(a.size_i, b.size_j);
 
-    for (int i = 0; i < tmp.size_i; i++) {
-        for (int j = 0; j < tmp.size_j; j++) {
-            for (int k = 0; k < a.size_j; k++) {
+    for (int i = 0; i < tmp.size_i; i++)
+        for (int j = 0; j < tmp.size_j; j++)
+            for (int k = 0; k < a.size_j; k++)
                 tmp.data[i][j] += a.data[i][k] * b.data[k][j];
-            }
-        }
-    }
 
     return tmp;
 }
@@ -216,7 +220,7 @@ matrix<T> matrix<T>::operator+(const matrix<T> & oth) {
 
     for (int i = 0; i < size_i; i++)
         for (int j = 0; j < size_j; j++)
-            tmp.data[i][j] = tmp.data[i][j] + oth.data[i][j];
+            tmp.data[i][j] += oth.data[i][j];
 
     return tmp;
 }
@@ -227,7 +231,7 @@ matrix<T> matrix<T>::operator+(const T & oth) {
 
     for (int i = 0; i < size_i; i++)
         for (int j = 0; j < size_j; j++)
-            tmp.data[i][j] = tmp.data[i][j] + oth;
+            tmp.data[i][j] += oth;
 
     return tmp;
 }
@@ -260,9 +264,40 @@ matrix<T> matrix<T>::operator-(const matrix<T> & oth) {
 
     for (int i = 0; i < size_i; i++)
         for (int j = 0; j < size_j; j++)
-            tmp.data[i][j] = tmp.data[i][j] - oth.data[i][j];
+            tmp.data[i][j] -= oth.data[i][j];
 
     return tmp;
+}
+
+template<typename T>
+matrix<T> matrix<T>::operator-(const T & oth) {
+    matrix<T> tmp(*this);
+
+    for (int i = 0; i < size_i; i++)
+        for (int j = 0; j < size_j; j++)
+            tmp.data[i][j] -= oth;
+
+    return tmp;
+}
+
+template<typename T>
+matrix<T> matrix<T>::operator-=(const matrix<T> & oth) {
+    assert((this->size_i == oth.size_i) && (this->size_j == oth.size_j));
+
+    for (int i = 0; i < size_i; i++)
+        for (int j = 0; j < size_j; j++)
+            this->data[i][j] -= oth.data[i][j];
+
+    return *this;
+}
+
+template<typename T>
+matrix<T> matrix<T>::operator-=(const T & oth) {
+    for (int i = 0; i < size_i; i++)
+        for (int j = 0; j < size_j; j++)
+            this->data[i][j] -= oth;
+
+    return *this;
 }
 
 template<typename T>
@@ -271,11 +306,9 @@ matrix<T> matrix<T>::operator*(const matrix<T> & oth) {
 
     matrix<T> tmp(this->size_i, this->size_j);
 
-    for (int i = 0; i < tmp.size_i; i++) {
-        for (int j = 0; j < tmp.size_j; j++) {
+    for (int i = 0; i < tmp.size_i; i++)
+        for (int j = 0; j < tmp.size_j; j++)
             tmp.data[i][j] = this->data[i][j] * oth.data[i][j];
-        }
-    }
 
     return tmp;
 }
@@ -289,6 +322,26 @@ matrix<T> matrix<T>::operator*(const T & oth) {
             tmp.data[i][j] = tmp.data[i][j] * oth;
 
     return tmp;
+}
+
+template<typename T>
+matrix<T> matrix<T>::operator*=(const matrix<T> & oth) {
+    assert((this->size_i == oth.size_i) && (this->size_j == oth.size_j));
+
+    for (int i = 0; i < tmp.size_i; i++)
+        for (int j = 0; j < tmp.size_j; j++)
+            this->data[i][j] = this->data[i][j] * oth.data[i][j];
+
+    return *this;
+}
+
+template<typename T>
+matrix<T> matrix<T>::operator*=(const T & oth) {
+    for (int i = 0; i < size_i; i++)
+        for (int j = 0; j < size_j; j++)
+            this->data[i][j] = this->data[i][j] * oth;
+
+    return *this;
 }
 
 template<typename T>
@@ -317,6 +370,17 @@ matrix<T> matrix<T>::operator=(const matrix<T> & oth) {
     copy_data(oth.data);
 
     return *this;
+}
+
+template<typename T>
+matrix<T> matrix<T>::operator-() {
+    matrix<T> tmp(*this);
+
+    for (int i = 0; i < size_i; i++)
+        for (int j = 0; j < size_j; j++)
+            tmp.data[i][j] = -tmp.data[i][j];
+
+    return tmp;
 }
 
 #endif /* __MATRIX_HPP */

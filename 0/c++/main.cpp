@@ -43,16 +43,16 @@ int main() {
     long time_c;
     long time_n;
 
-	nn_mnist.add(784, ReLU_e);
-	nn_mnist.add(32, ReLU_e);
-	nn_mnist.add(32, ReLU_e);
-	nn_mnist.add(10, sigmoida_e);
-	
-	nn_mnist.set_lr(0.0001);
+    nn_mnist.add(784, ReLU_e);
+    nn_mnist.add(32, ReLU_e);
+    nn_mnist.add(32, ReLU_e);
+    nn_mnist.add(10, sigmoida_e);
 
-	nn_mnist.compile();
+    nn_mnist.set_lr(0.0001);
 
-	//nn_mnist.load_coefs();
+    nn_mnist.compile();
+
+    //nn_mnist.load_coefs();
 
     for (int ep = 0; ep < 20; ep++) {
         std::cout << "Epoch : " << ep << std::endl;
@@ -65,7 +65,7 @@ int main() {
             T_.set_val(label, 0, 0.99);
 
             I_ /= 255.0;
-            I_ = I_ * 0.99;
+            I_ *= 0.99;
             I_ += 0.01;
 
             nn_mnist.train(&I_, &T_);
@@ -95,7 +95,7 @@ int main() {
             T_.set_val(label, 0, 0.99);
 
             I_ /= 255.0;
-            I_ = I_ * 0.99;
+            I_ *= 0.99;
             I_ += 0.01;
 
             O_ = nn_mnist.query(&I_);
@@ -128,7 +128,7 @@ int main() {
 
     std::cout << std::endl;
 
-	nn_mnist.save_coefs();
+    nn_mnist.save_coefs();
 
     return 0;
 }
