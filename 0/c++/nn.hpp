@@ -1,3 +1,12 @@
+/*
+*  File            :   nn.hpp
+*  Autor           :   Vlasov D.V.
+*  Data            :   2020.11.
+*  Language        :   c++
+*  Description     :
+*  Copyright(c)    :   2020 Vlasov D.V.
+*/
+
 #ifndef __NN_HPP
 #define __NN_HPP
 
@@ -97,16 +106,13 @@ void nn<T>::train(matrix<T>* I, matrix<T>* Tgt) {
     Layers_arch[0]->IM = I;
 
     for (unsigned i = 0; i < max_index; i++) {
-        //(*Layers_arch[i]).IM = (i == 0) ? I : (*Layers_arch[i - 1]).OM;
-
         *Layers_arch[i]->OM = matrix<T>::dot(*Layers_arch[i]->WM, *Layers_arch[i]->IM);
 
         Layers_arch[i]->f_act(*Layers_arch[i]->OM);
     }
 
-    for (unsigned i = max_index; i > 0; i--) {
+    for (unsigned i = max_index; i > 0; i--)
         *Layers_arch[i - 1]->EM = (i == max_index) ? ((*Tgt) - *Layers_arch[i - 1]->OM) : matrix<T>::dot(Layers_arch[i]->WM->Tr(), *Layers_arch[i]->EM);
-    }
 
     for (unsigned i = max_index; i > 0; i--) {
         Layers_arch[i - 1]->f_act_(*Layers_arch[i - 1]->OM);
@@ -117,9 +123,9 @@ void nn<T>::train(matrix<T>* I, matrix<T>* Tgt) {
 
 template <typename T>
 nn<T>::~nn() {
-    for (unsigned i = 0; i < Layers.size() - 1; i++) {
+    for (unsigned i = 0; i < Layers.size() - 1; i++)
         delete Layers_arch[i];
-    }
+
     delete[] Layers_arch;
 };
 

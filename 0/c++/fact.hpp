@@ -1,3 +1,12 @@
+/*
+*  File            :   fact.hpp
+*  Autor           :   Vlasov D.V.
+*  Data            :   2020.11.
+*  Language        :   c++
+*  Description     :
+*  Copyright(c)    :   2020 Vlasov D.V.
+*/
+
 #ifndef __FACT_HPP
 #define __FACT_HPP
 
@@ -19,7 +28,7 @@ void sigmoida_(matrix<T> & M) {
     for (int i = 0; i < M.size_i; i++)
         for (int j = 0; j < M.size_j; j++) {
             val = (1.0 / (exp(-M.data[i][j]) + 1));
-            M.data[i][j] = val * (1-val);
+            M.data[i][j] = val * (1 - val);
         }
 }
 
@@ -60,7 +69,7 @@ void softmax_(matrix<T> & M) {
     for (int i = 0; i < M.size_i; i++)
         for (int j = 0; j < M.size_j; j++) {
             val = (exp(M.data[i][j]) / sum);
-            M.data[i][j] = val*(1-val);
+            M.data[i][j] = val*(1 - val);
         }
 }
 

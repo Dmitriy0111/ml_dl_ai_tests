@@ -1,3 +1,12 @@
+/*
+*  File            :   layer.hpp
+*  Autor           :   Vlasov D.V.
+*  Data            :   2020.11.
+*  Language        :   c++
+*  Description     :
+*  Copyright(c)    :   2020 Vlasov D.V.
+*/
+
 #ifndef __LAYER_HPP
 #define __LAYER_HPP
 
@@ -12,8 +21,8 @@ public:
     matrix<T>       * OM;
     matrix<T>       * EM;
 
-    void            (*f_act)(matrix<T> &);
-    void            (*f_act_)(matrix<T> &);
+    void(*f_act)(matrix<T> &);
+    void(*f_act_)(matrix<T> &);
 
     layer();
     layer(unsigned IM_size, unsigned OM_size, unsigned fact);
@@ -31,20 +40,20 @@ layer<T>::layer(unsigned IM_size, unsigned OM_size, unsigned fact) {
     EM = new matrix<T>(OM_size, 1);
     switch (fact)
     {
-        case sigmoida_e:
-            f_act = sigmoida;
-            f_act_ = sigmoida_;
-            break;
-        case ReLU_e:
-            f_act = ReLU;
-            f_act_ = ReLU_;
-            break;
-        case softmax_e:
-            f_act = softmax;
-            f_act_ = softmax_;
-            break;
-        default:
-            break;
+    case sigmoida_e:
+        f_act = sigmoida;
+        f_act_ = sigmoida_;
+        break;
+    case ReLU_e:
+        f_act = ReLU;
+        f_act_ = ReLU_;
+        break;
+    case softmax_e:
+        f_act = softmax;
+        f_act_ = softmax_;
+        break;
+    default:
+        break;
     }
 }
 

@@ -1,3 +1,12 @@
+/*
+*  File            :   m_sl.hpp
+*  Autor           :   Vlasov D.V.
+*  Data            :   2020.11.
+*  Language        :   c++
+*  Description     :
+*  Copyright(c)    :   2020 Vlasov D.V.
+*/
+
 #ifndef __M_SL_HPP
 #define __M_SL_HPP
 
@@ -16,7 +25,7 @@ template <typename T>
 bool m_sl<T>::save(matrix<T> & M, std::string path2file, std::string file_name) {
     std::ofstream fp;
 
-    fp = std::ofstream(path2file+file_name+".dat");
+    fp = std::ofstream(path2file + file_name + ".dat");
     if (!fp) {
         return false;
     }
@@ -43,7 +52,7 @@ bool m_sl<T>::load(matrix<T> & M, std::string path2file, std::string file_name) 
     unsigned j = 0;
     T val;
 
-    fp = std::ifstream(path2file+file_name+".dat");
+    fp = std::ifstream(path2file + file_name + ".dat");
     if (!fp) {
         return false;
     }

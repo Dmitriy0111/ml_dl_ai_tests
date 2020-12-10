@@ -1,3 +1,12 @@
+/*
+*  File            :   matrix.hpp
+*  Autor           :   Vlasov D.V.
+*  Data            :   2020.11.
+*  Language        :   c++
+*  Description     :
+*  Copyright(c)    :   2020 Vlasov D.V.
+*/
+
 #ifndef __MATRIX_HPP
 #define __MATRIX_HPP
 
@@ -6,6 +15,10 @@
 #include <random>
 #include <cmath>
 #include <cassert>
+
+#ifdef __unix__
+#include <string.h>
+#endif
 
 #include "fact.hpp"
 
@@ -54,24 +67,25 @@ public:
     matrix<T> operator*=(const matrix<T> & oth);
     matrix<T> operator*=(const T & oth);
 
+    matrix<T> operator/(const T & oth);
     matrix<T> operator/=(const T & oth);
 
     matrix<T> operator=(const matrix<T> & oth);
 
     matrix<T> operator-();
 
-    template <typename T>
-    friend void sigmoida(matrix<T> & M);
-    template <typename T>
-    friend void sigmoida_(matrix<T> & M);
-    template <typename T>
-    friend void ReLU(matrix<T> & M);
-    template <typename T>
-    friend void ReLU_(matrix<T> & M);
-    template <typename T>
-    friend void softmax(matrix<T> & M);
-    template <typename T>
-    friend void softmax_(matrix<T> & M);
+    template <typename T1>
+    friend void sigmoida(matrix<T1> & M);
+    template <typename T1>
+    friend void sigmoida_(matrix<T1> & M);
+    template <typename T1>
+    friend void ReLU(matrix<T1> & M);
+    template <typename T1>
+    friend void ReLU_(matrix<T1> & M);
+    template <typename T1>
+    friend void softmax(matrix<T1> & M);
+    template <typename T1>
+    friend void softmax_(matrix<T1> & M);
 
 private:
     T           ** data;
@@ -126,7 +140,7 @@ void matrix<T>::fill_matrix(T fill) {
 }
 
 template<typename T>
-void matrix<T>::set_val(int i, int j, T val = 0) {
+void matrix<T>::set_val(int i, int j, T val) {
     this->data[i][j] = val;
 }
 
@@ -183,14 +197,13 @@ void matrix<T>::delete_data() {
 
 template<typename T>
 void matrix<T>::copy_data(T ** oth_data) {
-    for (int i = 0; i < size_i; i++)
-        for (int j = 0; j < size_j; j++)
-            this->data[i][j] = oth_data[i][j];
+    memcpy((void *)*this->data, (void *)*oth_data, size_i*size_j * sizeof(T));
 }
 
 template<typename T>
 void matrix<T>::normal() {
     std::default_random_engine gen;
+    gen.seed(std::chrono::system_clock::now().time_since_epoch().count());
     std::normal_distribution<double> dist(0.0, pow(this->size_i, -0.5));
 
     for (int i = 0; i < this->size_i; i++)
@@ -328,8 +341,8 @@ template<typename T>
 matrix<T> matrix<T>::operator*=(const matrix<T> & oth) {
     assert((this->size_i == oth.size_i) && (this->size_j == oth.size_j));
 
-    for (int i = 0; i < tmp.size_i; i++)
-        for (int j = 0; j < tmp.size_j; j++)
+    for (int i = 0; i < size_i; i++)
+        for (int j = 0; j < size_j; j++)
             this->data[i][j] = this->data[i][j] * oth.data[i][j];
 
     return *this;
@@ -342,6 +355,17 @@ matrix<T> matrix<T>::operator*=(const T & oth) {
             this->data[i][j] = this->data[i][j] * oth;
 
     return *this;
+}
+
+template<typename T>
+matrix<T> matrix<T>::operator/(const T & oth) {
+    matrix<T> tmp(*this);
+
+    for (int i = 0; i < size_i; i++)
+        for (int j = 0; j < size_j; j++)
+            tmp->data[i][j] /= oth;
+
+    return tmp;
 }
 
 template<typename T>
